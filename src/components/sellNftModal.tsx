@@ -113,15 +113,15 @@ export const SellNFTModal = ({
           <p className="p-4 text-lg">
             Create a listing to allow others to purchase your NFT.
           </p>
-          <div className="flex flex-col items-end gap-2 border-solid border-2 border-gray-400 rounded p-2 w-fit">
+          <div className="flex flex-col items-end gap-2 border-solid border-2 border-gray-400 rounded p-2">
             <div>#{tokenId}</div>
             {imageURI ? (
               <Image
-                loader={() => imageURI}
+                //loader={() => imageURI}
                 src={imageURI}
                 alt="NFT Image"
-                height="200"
-                width="200"
+                height={200}
+                width={200}
               />
             ) : (
               <Illustration height="180px" logo="lazyNft" width="100%" />

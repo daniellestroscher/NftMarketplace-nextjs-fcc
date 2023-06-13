@@ -101,15 +101,15 @@ export const UpdateListingModal = ({
             This is your listing. You may either update the listing price or
             cancel it.
           </p>
-          <div className="flex flex-col items-end gap-2 border-solid border-2 border-gray-400 rounded p-2 w-fit">
+          <div className="flex flex-col items-end gap-2 border-solid border-2 border-gray-400 rounded p-2">
             <div>#{tokenId}</div>
             {imageURI ? (
               <Image
-                // loader={() => imageURI}
+                //loader={() => imageURI}
                 src={imageURI}
                 alt="NFT Image"
-                height="200"
-                width="200"
+                height={200}
+                width={200}
               />
             ) : (
               <Illustration height="180px" logo="lazyNft" width="100%" />

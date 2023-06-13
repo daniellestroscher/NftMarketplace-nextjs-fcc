@@ -19,7 +19,7 @@ const NetworkBanner = () => {
   );
 
   const getChainId = async () => {
-    if (isAuthenticated && isWeb3Enabled && web3) {
+    if (isWeb3Enabled && web3) {
       const network = await web3.getNetwork();
       setCurrentChainId(network.chainId ?? 0);
     }

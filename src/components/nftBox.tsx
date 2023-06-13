@@ -81,25 +81,6 @@ const NftBox: NextPage<NftBoxProps> = ({
     },
   });
 
-  // async function updateUI() {
-  //   console.log(`TokenURI is: ${tokenURI}`);
-  //   // We are cheating a bit here...
-  //   if (tokenURI) {
-  //     const requestURL = (tokenURI as string).replace(
-  //       "ipfs://",
-  //       "https://ipfs.io/ipfs/"
-  //     );
-  //     const tokenURIResponse = await (await fetch(requestURL)).json();
-  //     const imageURI = tokenURIResponse.image;
-  //     const imageURIURL = (imageURI as string).replace(
-  //       "ipfs://",
-  //       "https://ipfs.io/ipfs/"
-  //     );
-  //     setImageURI(imageURIURL);
-  //     setTokenName(tokenURIResponse.name);
-  //     setTokenDescription(tokenURIResponse.description);
-  //   }
-  // }
   async function updateUI() {
     console.log(`TokenURI is: ${tokenURI}`);
     // We are cheating a bit here...
@@ -109,7 +90,6 @@ const NftBox: NextPage<NftBoxProps> = ({
         "https://ipfs.io/ipfs/"
       );
       const meta = await axios.get(requestURL);
-      console.log(meta);
 
       let imageURI = meta.data.image;
       imageURI = (imageURI as string).replace(
@@ -204,8 +184,9 @@ const NftBox: NextPage<NftBoxProps> = ({
                   //loader={() => imageURI}
                   src={imageURI}
                   alt="Nft Image"
-                  height="200"
-                  width="200"
+                  height={200}
+                  width={200}
+                  priority
                 />
                 {price && (
                   <div className="font-bold">

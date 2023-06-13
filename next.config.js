@@ -7,7 +7,9 @@ const nextConfig = {
         hostname: "ipfs.io",
       },
     ],
+    unoptimized: true,
   },
+  output: "export",
 };
 
 module.exports = nextConfig;
