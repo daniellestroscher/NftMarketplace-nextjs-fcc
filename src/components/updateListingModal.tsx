@@ -104,12 +104,18 @@ export const UpdateListingModal = ({
           <div className="flex flex-col items-end gap-2 border-solid border-2 border-gray-400 rounded p-2">
             <div>#{tokenId}</div>
             {imageURI ? (
-              <Image
-                //loader={() => imageURI}
+              // <Image
+              //   //loader={() => imageURI}
+              //   src={imageURI}
+              //   alt="NFT Image"
+              //   height={200}
+              //   width={200}
+              //   priority={true}
+              // />
+              <img
                 src={imageURI}
                 alt="NFT Image"
-                height={200}
-                width={200}
+                style={{ height: "200px", width: "auto" }}
               />
             ) : (
               <Illustration height="180px" logo="lazyNft" width="100%" />

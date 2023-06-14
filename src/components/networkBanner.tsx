@@ -19,7 +19,7 @@ const NetworkBanner = () => {
   );
 
   const getChainId = async () => {
-    if (isWeb3Enabled && web3) {
+    if (isAuthenticated && isWeb3Enabled && web3) {
       const network = await web3.getNetwork();
       setCurrentChainId(network.chainId ?? 0);
     }
@@ -30,9 +30,9 @@ const NetworkBanner = () => {
     getChainId();
   }, [isAuthenticated, isWeb3Enabled]);
 
-  Moralis.onChainChanged(() => {
-    window.location.reload();
-  });
+  // Moralis.onChainChanged(() => {
+  //   window.location.reload();
+  // });
 
   const [showNetworkSwitcherDialog, setShowNetworkSwitcherDialog] =
     useState(false);

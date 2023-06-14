@@ -180,13 +180,18 @@ const NftBox: NextPage<NftBoxProps> = ({
                 <div className="italic text-sm">
                   Owned by {formattedSellerAddress}
                 </div>
-                <Image
+                {/* <Image
                   //loader={() => imageURI}
                   src={imageURI}
                   alt="Nft Image"
                   height={200}
                   width={200}
                   priority
+                /> */}
+                <img
+                  src={imageURI}
+                  alt="NFT Image"
+                  style={{ width: "200px", height: "auto" }}
                 />
                 {price && (
                   <div className="font-bold">
