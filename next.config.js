@@ -9,7 +9,7 @@ const nextConfig = {
     ],
     unoptimized: true,
   },
-
+  exportTrailingSlash: true,
   output: "export",
 };
 
