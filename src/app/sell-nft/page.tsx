@@ -6,13 +6,13 @@ import { useAccount, useNetwork } from "wagmi";
 import { prepareWriteContract, writeContract, readContract } from "@wagmi/core";
 import nftMarketplaceAbi from "../../constants/NftMarketplace.json";
 import networkMapping from "../../constants/networkMapping.json";
-import { NetworkMappingType, Nft } from "@/types";
+import { NetworkMappingType, Nft } from "@/types.ts";
 import { BigNumber, ethers } from "ethers";
 import { useQuery } from "@apollo/client";
-import { GET_ACTIVE_ITEMS } from "@/constants/subgraphQueries";
-import NftBox from "@/components/nftBox";
+import { GET_ACTIVE_ITEMS } from "@/constants/subgraphQueries.ts";
+import NftBox from "@/components/nftBox.tsx";
 import { Divider, Input } from "@mui/material";
-import { SellNFTModal } from "@/components/sellNftModal";
+import { SellNFTModal } from "@/components/sellNftModal.tsx";
 import { Abi } from "abitype";
 
 type chainType =

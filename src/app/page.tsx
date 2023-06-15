@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react";
 
 import { useNetwork, useAccount } from "wagmi";
 import networkMapping from "../constants/networkMapping.json";
-import { Nft, NetworkMappingType } from "@/types";
+import { Nft, NetworkMappingType } from "@/types.ts";
 import { useQuery } from "@apollo/client";
-import { GET_ACTIVE_ITEMS } from "@/constants/subgraphQueries";
+import { GET_ACTIVE_ITEMS } from "@/constants/subgraphQueries.ts";
 
-import NftBox from "@/components/nftBox";
+import NftBox from "@/components/nftBox.tsx";
 
 const networkMappingTyped = networkMapping as NetworkMappingType;
 

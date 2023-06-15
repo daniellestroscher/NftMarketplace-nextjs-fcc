@@ -1,13 +1,9 @@
 import React, { useState } from "react";
-import { prepareWriteContract, writeContract, readContract } from "@wagmi/core";
+import { prepareWriteContract, writeContract } from "@wagmi/core";
 
 import { ethers } from "ethers";
 import { Abi } from "abitype";
-import Image from "next/image";
-import Modal from "@mui/material/Modal";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import { CircularProgress, Input } from "@mui/material";
+import { CircularProgress, Input, Box, Button, Modal } from "@mui/material";
 
 export interface SellNFTModalProps {
   isVisible: boolean;

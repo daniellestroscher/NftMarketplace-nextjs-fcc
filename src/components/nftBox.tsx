@@ -3,15 +3,12 @@ import nftMarketplaceAbi from "../constants/NftMarketplace.json";
 
 import { useAccount } from "wagmi";
 import { readContract, prepareWriteContract, writeContract } from "@wagmi/core";
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import { SellNFTModal } from "./sellNftModal";
-import { UpdateListingModal } from "./updateListingModal";
+import { SellNFTModal } from "./sellNftModal.tsx";
+import { UpdateListingModal } from "./updateListingModal.tsx";
 import axios from "axios";
-import Card from "@mui/material/Card";
-import Tooltip from "@mui/material/Tooltip";
-import CircularProgress from "@mui/material/CircularProgress";
+import { Card, Tooltip, CircularProgress } from "@mui/material";
 import { Abi } from "abitype";
 
 interface NftBoxProps {
