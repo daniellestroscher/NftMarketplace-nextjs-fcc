@@ -1,6 +1,7 @@
 "use client";
-import React from "react";
-import { useMoralis } from "react-moralis";
+import React, { useEffect, useState } from "react";
+
+import { useNetwork, useAccount } from "wagmi";
 import networkMapping from "../constants/networkMapping.json";
 import { Nft, NetworkMappingType } from "@/types";
 import { useQuery } from "@apollo/client";
@@ -11,17 +12,27 @@ import NftBox from "@/components/nftBox";
 const networkMappingTyped = networkMapping as NetworkMappingType;
 
 export default function Home() {
-  const { isWeb3Enabled, chainId } = useMoralis();
-  const chainString = chainId ? parseInt(chainId).toString() : "31337";
+  const [hasMounted, setHasMounted] = useState<boolean>();
+  const { connector: activeConnector, isConnected } = useAccount();
+  const { chain } = useNetwork();
+
+  const chainString = chain ? chain.id : "31337";
   const marketplaceAddress = networkMappingTyped[chainString].NftMarketplace[0];
 
   const { loading, data: listedNfts } = useQuery(GET_ACTIVE_ITEMS);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+  if (!hasMounted) {
+    return null;
+  }
 
   return (
     <div className="container mx-auto">
       <h1 className="py-4 px-4 font-bold text-2xl">Recently Listed</h1>
       <div className="flex flex-wrap">
-        {isWeb3Enabled &&
+        {isConnected &&
           (loading || !listedNfts ? (
             <div>Loading...</div>
           ) : (

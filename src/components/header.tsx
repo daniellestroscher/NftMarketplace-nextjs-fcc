@@ -1,5 +1,5 @@
 import React from "react";
-import { ConnectButton } from "web3uikit";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 
 export default function Header() {
@@ -13,7 +13,7 @@ export default function Header() {
         <Link href="/sell-nft" as={`/sell-nft`} className="mr-4 p-6">
           Sell NFT
         </Link>
-        <ConnectButton moralisAuth={false} />
+        <ConnectButton />
       </div>
     </nav>
   );

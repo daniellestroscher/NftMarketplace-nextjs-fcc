@@ -1,7 +1,8 @@
-import { useMoralis } from "react-moralis";
+//import { useMoralis } from "react-moralis";
+import { useNetwork, useAccount } from "wagmi";
 import { useEffect, useState } from "react";
 import networkMapping from "../constants/networkMapping.json";
-import { BannerStrip } from "web3uikit";
+//import { BannerStrip } from "web3uikit";
 
 const isValidNetwork = (network: string) => {
   if (networkMapping.hasOwnProperty(network)) {
@@ -11,24 +12,24 @@ const isValidNetwork = (network: string) => {
 };
 
 const NetworkBanner = () => {
-  const { Moralis, isAuthenticated, web3, isWeb3Enabled, chainId } =
-    useMoralis();
+  const { connector: activeConnector, isConnected } = useAccount();
+  const { chain } = useNetwork();
 
   const [currentChainId, setCurrentChainId] = useState<number | undefined>(
     undefined
   );
 
   const getChainId = async () => {
-    if (isAuthenticated && isWeb3Enabled && web3) {
-      const network = await web3.getNetwork();
-      setCurrentChainId(network.chainId ?? 0);
+    if (isConnected && chain) {
+      const chainId = chain.id;
+      setCurrentChainId(chainId ?? 0);
     }
     return 0;
   };
 
   useEffect(() => {
     getChainId();
-  }, [isAuthenticated, isWeb3Enabled]);
+  }, [isConnected, chain]);
 
   // Moralis.onChainChanged(() => {
   //   window.location.reload();
@@ -51,11 +52,12 @@ const NetworkBanner = () => {
   return (
     <>
       {showNetworkSwitcherDialog && (
-        <BannerStrip
-          type="error"
-          text="Connected to unsupported network"
-          id={"1"}
-        />
+        // <BannerStrip
+        //   type="error"
+        //   text="Connected to unsupported network"
+        //   id={"1"}
+        // />
+        <div>Connected to unsupported network</div>
       )}
     </>
   );

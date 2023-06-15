@@ -7,8 +7,8 @@ export interface NetworkMappingType {
   };
 }
 export interface Nft {
-  price: number;
+  price?: number;
   nftAddress: string;
   tokenId: string;
-  seller: string;
+  seller?: string;
 }

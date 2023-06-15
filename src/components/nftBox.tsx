@@ -1,22 +1,18 @@
-import type { NextPage } from "next";
-import {
-  Card,
-  Tooltip,
-  Illustration,
-  useNotification,
-  Input,
-  Button,
-} from "web3uikit";
 import nftAbi from "../constants/BasicNft.json";
 import nftMarketplaceAbi from "../constants/NftMarketplace.json";
 
-import { useMoralis, useWeb3Contract } from "react-moralis";
+import { useAccount } from "wagmi";
+import { readContract, prepareWriteContract, writeContract } from "@wagmi/core";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { SellNFTModal } from "./sellNftModal";
 import { UpdateListingModal } from "./updateListingModal";
 import axios from "axios";
+import Card from "@mui/material/Card";
+import Tooltip from "@mui/material/Tooltip";
+import CircularProgress from "@mui/material/CircularProgress";
+import { Abi } from "abitype";
 
 interface NftBoxProps {
   price?: number;
@@ -41,45 +37,51 @@ const truncateStr = (fullStr: string, strLen: number) => {
   );
 };
 
-const NftBox: NextPage<NftBoxProps> = ({
+export default function NftBox({
   price,
   nftAddress,
   tokenId,
   nftMarketplaceAddress,
   seller,
-}: NftBoxProps) => {
-  const { isWeb3Enabled, account } = useMoralis();
+}: NftBoxProps) {
+  const { isConnected, address } = useAccount();
   const [imageURI, setImageURI] = useState<string | undefined>();
+  const [tokenURI, setTokenURI] = useState<string | undefined>();
   const [tokenName, setTokenName] = useState<string | undefined>();
   const [tokenDescription, setTokenDescription] = useState<
     string | undefined
   >();
-  // State to handle display of 'create listing' or 'update listing' modal
+  // State to handle display of 'update listing' modal
   const [showModal, setShowModal] = useState(false);
   const hideModal = () => setShowModal(false);
-  const isListed = seller !== undefined;
+  const isListed = seller !== undefined && price != undefined;
 
-  const dispatch = useNotification();
+  //const dispatch = useNotification();
 
-  const { runContractFunction: getTokenURI, data: tokenURI } = useWeb3Contract({
-    abi: nftAbi,
-    contractAddress: nftAddress,
-    functionName: "tokenURI",
-    params: {
-      tokenId: tokenId,
-    },
-  });
+  async function getTokenURI() {
+    const data = await readContract({
+      address: nftAddress as `0x${string}`,
+      abi: nftAbi,
+      functionName: "tokenURI",
+      args: [tokenId],
+    });
+    if (data) {
+      setTokenURI(data.toString());
+    }
+  }
 
-  const { runContractFunction: buyItem, error: buyError } = useWeb3Contract({
-    abi: nftMarketplaceAbi,
-    contractAddress: nftMarketplaceAddress,
-    functionName: "buyItem",
-    msgValue: price,
-    params: {
-      nftAddress: nftAddress,
-      tokenId: tokenId,
-    },
-  });
+  async function buyItem() {
+    const { request } = await prepareWriteContract({
+      address: nftMarketplaceAddress as `0x${string}`,
+      abi: nftMarketplaceAbi,
+      functionName: "buyItem",
+      args: [nftAddress, tokenId],
+    });
+    const { hash } = await writeContract(request);
+    if (hash) {
+      console.log("buy item successful");
+    }
+  }
 
   async function updateUI() {
     console.log(`TokenURI is: ${tokenURI}`);
@@ -107,10 +109,11 @@ const NftBox: NextPage<NftBoxProps> = ({
   }, [tokenURI]);
 
   useEffect(() => {
-    isWeb3Enabled && getTokenURI();
-  }, [isWeb3Enabled]);
+    isConnected && getTokenURI();
+  }, [isConnected]);
 
-  const isOwnedByUser = seller === account || seller === undefined;
+  const isOwnedByUser =
+    seller?.toLowerCase() === address?.toLowerCase() || seller === undefined;
   const formattedSellerAddress = isOwnedByUser
     ? "you"
     : truncateStr(seller || "", 15);
@@ -120,23 +123,14 @@ const NftBox: NextPage<NftBoxProps> = ({
       setShowModal(true);
     } else {
       console.log(nftMarketplaceAddress);
-      await buyItem({
-        onSuccess: () => handleBuyItemSuccess(),
-        onError: (error) => {
-          console.log(error);
-          alert(`Error buying NFT: ${error}`);
-        },
-      });
+      try {
+        await buyItem();
+        alert("bought item successfully");
+      } catch (err) {
+        console.log(err);
+        alert(`Error buying NFT: ${err}`);
+      }
     }
-  };
-
-  const handleBuyItemSuccess = () => {
-    dispatch({
-      type: "success",
-      message: "Item bought successfully",
-      title: "Item Bought",
-      position: "topR",
-    });
   };
 
   const tooltipContent = isListed
@@ -150,8 +144,8 @@ const NftBox: NextPage<NftBoxProps> = ({
       <SellNFTModal
         isVisible={showModal && !isListed}
         imageURI={imageURI}
-        nftAbi={nftAbi}
-        nftMarketplaceAbi={nftMarketplaceAbi}
+        nftAbi={nftAbi as Abi}
+        nftMarketplaceAbi={nftMarketplaceAbi as Abi}
         nftAddress={nftAddress}
         tokenId={tokenId}
         onClose={hideModal}
@@ -160,55 +154,54 @@ const NftBox: NextPage<NftBoxProps> = ({
       <UpdateListingModal
         isVisible={showModal && isListed}
         imageURI={imageURI}
-        nftMarketplaceAbi={nftMarketplaceAbi}
+        nftMarketplaceAbi={nftMarketplaceAbi as Abi}
         nftAddress={nftAddress}
         tokenId={tokenId}
         onClose={hideModal}
         nftMarketplaceAddress={nftMarketplaceAddress}
         currentPrice={price}
       />
-      <Card
-        title={tokenName}
-        description={tokenDescription}
-        onClick={handleCardClick}
-      >
-        <Tooltip content={tooltipContent} position="right">
-          <div className="p-2">
-            {imageURI ? (
-              <div className="flex flex-col items-end gap-2">
-                <div>#{tokenId}</div>
-                <div className="italic text-sm">
-                  Owned by {formattedSellerAddress}
+      <Tooltip title={tooltipContent}>
+        <Card
+          variant="outlined"
+          onClick={handleCardClick}
+          className="p-2 w-60 hover:cursor-pointer"
+        >
+          {imageURI ? (
+            <div className="flex flex-col items-end gap-2">
+              <div>#{tokenId}</div>
+              <div className="italic text-sm">
+                Owned by {formattedSellerAddress}
+              </div>
+              <img
+                src={imageURI}
+                alt="NFT Image"
+                style={{ width: "200px", height: "auto" }}
+              />
+              {price ? (
+                <div className="font-bold">
+                  {ethers.utils.formatEther(price)} ETH
                 </div>
-                {/* <Image
-                  //loader={() => imageURI}
-                  src={imageURI}
-                  alt="Nft Image"
-                  height={200}
-                  width={200}
-                  priority
-                /> */}
-                <img
-                  src={imageURI}
-                  alt="NFT Image"
-                  style={{ width: "200px", height: "auto" }}
-                />
-                {price && (
-                  <div className="font-bold">
-                    {ethers.utils.formatEther(price)} ETH
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center gap-1">
-                <Illustration height="180px" logo="lazyNft" width="100%" />
-                Loading...
-              </div>
-            )}
-          </div>
-        </Tooltip>
-      </Card>
+              ) : (
+                <br />
+              )}
+              {tokenName && (
+                <div>
+                  <h6>
+                    <b>{tokenName}</b>
+                  </h6>
+                  <p>{tokenDescription}</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-1">
+              <CircularProgress />
+              Loading...
+            </div>
+          )}
+        </Card>
+      </Tooltip>
     </div>
   );
-};
-export default NftBox;
+}

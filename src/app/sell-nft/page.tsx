@@ -1,15 +1,19 @@
 "use client";
+import React, { useEffect, useState } from "react";
 import type { NextPage } from "next";
-import { Button, useNotification } from "web3uikit";
-import { useWeb3Contract, useMoralis, useChain } from "react-moralis";
+import Button from "@mui/material/Button";
+import { useAccount, useNetwork } from "wagmi";
+import { prepareWriteContract, writeContract, readContract } from "@wagmi/core";
 import nftMarketplaceAbi from "../../constants/NftMarketplace.json";
 import networkMapping from "../../constants/networkMapping.json";
 import { NetworkMappingType, Nft } from "@/types";
 import { BigNumber, ethers } from "ethers";
-import { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_ACTIVE_ITEMS } from "@/constants/subgraphQueries";
 import NftBox from "@/components/nftBox";
+import { Divider, Input } from "@mui/material";
+import { SellNFTModal } from "@/components/sellNftModal";
+import { Abi } from "abitype";
 
 type chainType =
   | "eth"
@@ -38,11 +42,17 @@ type chainType =
   | "0xfa";
 
 const SellNft: NextPage = () => {
-  const dispatch = useNotification();
+  // const dispatch = useNotification();
+  const [nftContractAddress, setNftContractAddress] = useState<string>("");
+  const [nftTokenId, setNftTokenId] = useState<string>("");
+  const [displayUnlisted, setDisplayUnlisted] = useState(false);
 
-  const { account } = useMoralis();
-  const { chainId } = useChain();
-  const chainString = chainId ? parseInt(chainId).toString() : "31337";
+  //const hideModal = () => setShowModal(false);
+
+  const { address } = useAccount();
+  const { chain } = useNetwork();
+
+  const chainString = chain ? chain.id : "31337";
   const currentNetworkMapping = (networkMapping as NetworkMappingType)[
     chainString
   ];
@@ -59,48 +69,44 @@ const SellNft: NextPage = () => {
     BigNumber | undefined
   >(undefined);
 
-  // @ts-ignore
-  const { data, runContractFunction, isFetching, isLoading } = useWeb3Contract(
-    {}
-  );
-
-  const fetchAvailableProceeds = async () => {
-    const result = await runContractFunction({
-      params: {
-        abi: nftMarketplaceAbi,
-        contractAddress: nftMarketplaceAddress,
-        functionName: "getProceeds",
-        params: {
-          seller: account,
-        },
-      },
-    });
-    setAvailableProceeds(result as BigNumber);
-  };
+  async function fetchAvailableProceeds() {
+    const data = (await readContract({
+      address: nftMarketplaceAddress as `0x${string}`,
+      abi: nftMarketplaceAbi,
+      functionName: "getProceeds",
+      args: [address],
+    })) as BigNumber;
+    if (data) {
+      let availableProceeds = BigNumber.from(data.toString());
+      setAvailableProceeds(availableProceeds);
+    }
+  }
 
   useEffect(() => {
     fetchAvailableProceeds();
-  }, [account]);
+  }, [address]);
 
   const handleWithdraw = async () => {
-    await runContractFunction({
-      params: {
-        abi: nftMarketplaceAbi,
-        contractAddress: nftMarketplaceAddress,
-        functionName: "withdrawProceeds",
-      },
-      onSuccess: handleWithdrawSuccess,
+    const { request } = await prepareWriteContract({
+      address: nftMarketplaceAddress as `0x${string}`,
+      abi: nftMarketplaceAbi,
+      functionName: "withdrawProceeds",
     });
+    const { hash } = await writeContract(request);
+    if (hash) {
+      alert("withdraw successful");
+    }
   };
 
-  const handleWithdrawSuccess = () => {
-    dispatch({
-      type: "success",
-      message: "Proceeds withdrawn successfully",
-      title: "Proceeds Withdrawn",
-      position: "topR",
-    });
-  };
+  //const handleWithdrawSuccess = () => {
+  // dispatch({
+  //   type: "success",
+  //   message: "Proceeds withdrawn successfully",
+  //   title: "Proceeds Withdrawn",
+  //   position: "topR",
+  // });
+  //alert("withdraw successful");
+  //};
 
   const { loading, data: listedNfts } = useQuery(GET_ACTIVE_ITEMS);
 
@@ -128,11 +134,34 @@ const SellNft: NextPage = () => {
         };
   };
 
+  const unlistedAddedNfts: Nft[] = [];
+  const handleAddNft = () => {
+    console.log("in handle listing");
+    setDisplayUnlisted(true);
+    const NFT = { nftAddress: nftContractAddress, tokenId: nftTokenId };
+    unlistedAddedNfts.push(NFT);
+    console.log(unlistedAddedNfts, "unlistedAddedNfts");
+  };
+
   return (
     <div className="container mx-auto">
       <div className="py-4">
         <h2 className="text-2xl">Your NFTs</h2>
         <div className="flex flex-wrap">
+          {!loading && listedNfts.activeItems.length == 0 && (
+            <div>No Nfts Listed</div>
+          )}
+          {!loading && nftContractAddress && nftTokenId && (
+            <div className="">
+              <NftBox
+                nftAddress={nftContractAddress}
+                nftMarketplaceAddress={nftMarketplaceAddress}
+                tokenId={nftTokenId}
+                seller={address}
+                price={undefined}
+              />
+            </div>
+          )}
           {!loading &&
             listedNfts.activeItems.map((nft: Nft) => {
               const { seller, price } = getSellerAndPrice(
@@ -154,7 +183,29 @@ const SellNft: NextPage = () => {
         </div>
       </div>
       <div className="py-4">
-        <div className="flex flex-col gap-2 justify-items-start w-fit">
+        <div className="flex flex-col gap-6 justify-items-end w-fit p-2">
+          <h2 className="text-2xl">List New NFT</h2>
+          <Input
+            placeholder="NFT Contract Address"
+            name="Nft Contract Address"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setNftContractAddress(event.target.value);
+            }}
+            type="text"
+            color="primary"
+          ></Input>
+          <Input
+            placeholder="Token ID"
+            name="Token ID"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setNftTokenId(event.target.value);
+            }}
+            type="number"
+            color="primary"
+          ></Input>
+        </div>
+
+        <div className="flex flex-col gap-2 justify-items-start w-fit fixed bottom-10 right-5 bg-sky-500/20 p-3 rounded">
           <h2 className="text-2xl">Withdraw proceeds</h2>
           {hasNonZeroAvailableProceeds ? (
             <p>
@@ -165,13 +216,14 @@ const SellNft: NextPage = () => {
             <p>No withdrawable proceeds detected</p>
           )}
           <Button
+            variant="outlined"
             disabled={!hasNonZeroAvailableProceeds}
             id="withdraw-proceeds"
             onClick={handleWithdraw}
-            text="Withdraw"
-            theme="outline"
             type="button"
-          />
+          >
+            Withdraw
+          </Button>
         </div>
       </div>
     </div>
