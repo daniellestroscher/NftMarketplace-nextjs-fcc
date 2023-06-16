@@ -9,6 +9,9 @@ const nextConfig = {
     ],
     unoptimized: true,
   },
+  env: {
+    WALLET_CONNECT_PROJECT_ID: process.env.WALLET_CONNECT_PROJECT_ID,
+  },
   trailingSlash: true,
   output: "export",
   //output: "standalone",

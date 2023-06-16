@@ -20,7 +20,8 @@ import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { mainnet, polygon, sepolia } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 const WALLET_CONNECT_PROJECT_ID = process.env
-  .NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID as string;
+  .WALLET_CONNECT_PROJECT_ID as string;
+  
 console.log(WALLET_CONNECT_PROJECT_ID, "id");
 
 const { chains, publicClient } = configureChains(

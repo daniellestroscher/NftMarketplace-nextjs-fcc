@@ -1,7 +1,7 @@
 1:HL["/_next/static/css/06a8d9d3b58683d2.css",{"as":"style"}]
 2:HL["/_next/static/css/cf7960682ee23988.css",{"as":"style"}]
 0:[[["",{"children":["sell-nft",{"children":["__PAGE__",{}]}]},"$undefined","$undefined",true],"$L3",[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/css/06a8d9d3b58683d2.css","precedence":"next"}],["$","link","1",{"rel":"stylesheet","href":"/_next/static/css/cf7960682ee23988.css","precedence":"next"}]],["$L4",null]]]]
-5:I{"id":"64575","chunks":["7070:static/chunks/3d63cbbc-74e2be8b9cdb3eaf.js","6507:static/chunks/6507-0368851b10fcac42.js","2935:static/chunks/2935-0f1e5f80ea1ce5bd.js","3185:static/chunks/app/layout-ee135237fc69a462.js"],"name":"","async":false}
+5:I{"id":"64575","chunks":["7070:static/chunks/3d63cbbc-74e2be8b9cdb3eaf.js","6507:static/chunks/6507-0368851b10fcac42.js","2935:static/chunks/2935-0f1e5f80ea1ce5bd.js","3185:static/chunks/app/layout-ce29fe06d52f221b.js"],"name":"","async":false}
 6:I{"id":"14463","chunks":["2272:static/chunks/webpack-b169768e4eec0e1e.js","9253:static/chunks/bce60fc1-90fc456aac55a47b.js","6488:static/chunks/6488-e195b20e34a316b5.js"],"name":"","async":false}
 7:I{"id":"91010","chunks":["2272:static/chunks/webpack-b169768e4eec0e1e.js","9253:static/chunks/bce60fc1-90fc456aac55a47b.js","6488:static/chunks/6488-e195b20e34a316b5.js"],"name":"","async":false}
 8:I{"id":"14143","chunks":["2272:static/chunks/webpack-b169768e4eec0e1e.js","9253:static/chunks/bce60fc1-90fc456aac55a47b.js","6488:static/chunks/6488-e195b20e34a316b5.js"],"name":"","async":false}
